@@ -14,6 +14,8 @@
   <!-- Firebase SDK Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <!-- html2canvas لتحميل الجدول كصورة -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
     body {
@@ -82,6 +84,24 @@
         <button id="toggleEditBtn" onclick="toggleEditMode()" class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
           ✏️ <span id="editBtnLabel">تعديل سريع</span>
         </button>
+
+        <!-- زر تحميل الجدول -->
+        <div class="relative inline-block text-right">
+          <button onclick="toggleDownloadMenu()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-sm transition">
+            📥 تحميل الجدول ▾
+          </button>
+          <div id="downloadMenu" class="hidden absolute left-0 sm:right-auto sm:left-0 mt-1.5 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-bold text-slate-800">
+            <button onclick="downloadAsImage()" class="w-full text-right px-4 py-2 hover:bg-slate-100 flex items-center gap-2">
+              <span>🖼️</span> تحميل كصورة (PNG)
+            </button>
+            <button onclick="downloadAsPDF()" class="w-full text-right px-4 py-2 hover:bg-slate-100 flex items-center gap-2">
+              <span>📑</span> حفظ كملف PDF
+            </button>
+            <button onclick="downloadAsHTML()" class="w-full text-right px-4 py-2 hover:bg-slate-100 flex items-center gap-2">
+              <span>🌐</span> تحميل كصفحة ويب (HTML)
+            </button>
+          </div>
+        </div>
 
         <!-- زر الطباعة المباشرة -->
         <button onclick="window.print()" class="flex items-center gap-1.5 px-4 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white shadow-sm transition">
@@ -789,6 +809,65 @@
         scheduleData[dayIdx][type].hours = val;
         saveData();
       }
+    }
+
+    // دوال تحميل الجدول
+    function toggleDownloadMenu() {
+      const menu = document.getElementById('downloadMenu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', function(e) {
+      const menu = document.getElementById('downloadMenu');
+      if (menu && !menu.classList.contains('hidden')) {
+        if (!e.target.closest('.relative')) {
+          menu.classList.add('hidden');
+        }
+      }
+    });
+
+    function downloadAsImage() {
+      toggleDownloadMenu();
+      const element = document.querySelector('main') || document.body;
+      
+      const notif = document.createElement('div');
+      notif.className = 'fixed bottom-5 right-5 bg-blue-900 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-2xl z-50 animate-bounce flex items-center gap-2';
+      notif.innerHTML = '<span>⏳</span><span>جارٍ تجهيز صورة الجدول عالية الدقة...</span>';
+      document.body.appendChild(notif);
+
+      if (typeof html2canvas !== 'undefined') {
+        html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+          const link = document.createElement('a');
+          link.download = 'جدول_المدارسة_الأسبوعي.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+          notif.remove();
+        }).catch(err => {
+          console.error(err);
+          notif.remove();
+          window.print();
+        });
+      } else {
+        notif.remove();
+        window.print();
+      }
+    }
+
+    function downloadAsPDF() {
+      toggleDownloadMenu();
+      window.print();
+    }
+
+    function downloadAsHTML() {
+      toggleDownloadMenu();
+      const htmlContent = document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'جدول_المدارسة_الأسبوعي.html';
+      a.click();
+      URL.revokeObjectURL(url);
     }
 
     window.onload = loadData;
