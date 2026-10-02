@@ -85,27 +85,14 @@
           ✏️ <span id="editBtnLabel">تعديل سريع</span>
         </button>
 
-        <!-- زر تحميل الجدول -->
-        <div class="relative inline-block text-right">
-          <button onclick="toggleDownloadMenu()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-blue-700 hover:bg-blue-800 text-white shadow-sm transition">
-            📥 تحميل الجدول ▾
-          </button>
-          <div id="downloadMenu" class="hidden absolute left-0 sm:right-auto sm:left-0 mt-1.5 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-bold text-slate-800">
-            <button onclick="downloadAsImage()" class="w-full text-right px-4 py-2 hover:bg-slate-100 flex items-center gap-2">
-              <span>🖼️</span> تحميل كصورة (PNG)
-            </button>
-            <button onclick="downloadAsPDF()" class="w-full text-right px-4 py-2 hover:bg-slate-100 flex items-center gap-2">
-              <span>📑</span> حفظ كملف PDF
-            </button>
-            <button onclick="downloadAsHTML()" class="w-full text-right px-4 py-2 hover:bg-slate-100 flex items-center gap-2">
-              <span>🌐</span> تحميل كصفحة ويب (HTML)
-            </button>
-          </div>
-        </div>
+        <!-- زر تحميل الجدول كصورة -->
+        <button onclick="downloadAsImage()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md transition transform active:scale-95">
+          🖼️ تحميل كصورة
+        </button>
 
-        <!-- زر الطباعة المباشرة -->
-        <button onclick="window.print()" class="flex items-center gap-1.5 px-4 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white shadow-sm transition">
-          🖨️ طباعة الجدول
+        <!-- زر الطباعة وحفظ PDF -->
+        <button onclick="downloadAsPDF()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-extrabold rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white shadow-md transition transform active:scale-95">
+          📑 طباعة / حفظ PDF
         </button>
 
         <!-- زر تصفير الأسبوع -->
@@ -114,6 +101,27 @@
         </button>
       </div>
     </header>
+
+    <!-- شريط بارز جداً ومخصص لتحميل الجدول في جهازك -->
+    <div class="no-print bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 border-2 border-blue-400/40">
+      <div class="flex items-center gap-3 text-right">
+        <div class="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-2xl shadow">
+          📥
+        </div>
+        <div>
+          <h3 class="font-extrabold text-sm sm:text-base text-amber-300">تحميل الجدول وحفظه في جهازك فوراً:</h3>
+          <p class="text-xs text-blue-100 mt-0.5">اضغط على الزر الأصفر لتنزيل الجدول كصورة واضحة في هاتفك أو حاسوبك</p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+        <button onclick="downloadAsImage()" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-black rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-md transition transform hover:-translate-y-0.5 active:translate-y-0">
+          🖼️ اضغط هنا لتنزيل الجدول كصورة (PNG)
+        </button>
+        <button onclick="downloadAsPDF()" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow transition">
+          📑 حفظ كـ PDF
+        </button>
+      </div>
+    </div>
 
     <!-- بطاقات التوجيه الذهبي للأوراد الراتبة -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-3">
