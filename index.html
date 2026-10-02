@@ -12,274 +12,506 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Amiri:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
   
   <!-- Firebase SDK Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <!-- html2canvas لتحميل الجدول كصورة -->
+  <!-- html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'system-ui', 'sans-serif'],
+            amiri: ['Amiri', 'serif'],
+          },
+          colors: {
+            joussour: {
+              gold: '#F5C518',
+              goldLight: '#FFF3C4',
+              goldDark: '#B8960F',
+              black: '#1A1A2E',
+              blackLight: '#16213E',
+              blackDeep: '#0F0F1A',
+            }
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'float-delay': 'float 6s ease-in-out 2s infinite',
+            'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+            'slide-up': 'slide-up 0.8s ease-out',
+            'count-glow': 'count-glow 2s ease-in-out infinite',
+            'shimmer': 'shimmer 3s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            'pulse-soft': {
+              '0%, 100%': { opacity: '0.6' },
+              '50%': { opacity: '1' },
+            },
+            'slide-up': {
+              '0%': { opacity: '0', transform: 'translateY(30px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            'count-glow': {
+              '0%, 100%': { textShadow: '0 0 10px rgba(245, 197, 24, 0.3)' },
+              '50%': { textShadow: '0 0 25px rgba(245, 197, 24, 0.7)' },
+            },
+            'shimmer': {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            }
+          }
+        }
+      }
+    }
+  </script>
 
   <style>
     body {
       font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f8fafc;
       color: #0f172a;
     }
     .font-amiri {
       font-family: 'Amiri', serif;
     }
+
+    /* Hero gradient */
+    .hero-gradient {
+      background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 25%, #16213E 50%, #1A1A2E 75%, #0F0F1A 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-gradient::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(245, 197, 24, 0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 80%, rgba(245, 197, 24, 0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Geometric decoration */
+    .geo-pattern {
+      position: absolute;
+      border: 1px solid rgba(245, 197, 24, 0.12);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* Countdown digits */
+    .countdown-digit {
+      background: linear-gradient(135deg, rgba(245, 197, 24, 0.15) 0%, rgba(245, 197, 24, 0.05) 100%);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(245, 197, 24, 0.25);
+    }
+
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Week context banner shimmer */
+    .shimmer-bg {
+      background: linear-gradient(90deg, transparent 0%, rgba(245,197,24,0.08) 50%, transparent 100%);
+      background-size: 200% 100%;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+
     @media print {
-      body {
-        background-color: #ffffff !important;
-        padding: 0 !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-      .print-shadow-none {
-        box-shadow: none !important;
-        border: 1px solid #cbd5e1 !important;
-      }
-      .print-header {
-        display: block !important;
-      }
+      body { background-color: #ffffff !important; padding: 0 !important; }
+      .no-print { display: none !important; }
+      .print-shadow-none { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+      .print-header { display: block !important; }
+    }
+
+    /* Progress ring */
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.5s ease-in-out;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
     }
   </style>
 </head>
-<body class="p-2 sm:p-5 min-h-screen">
+<body class="min-h-screen bg-slate-50">
 
-  <!-- ترويسة خاصة بالطباعة الورقية A4 -->
-  <div class="print-header hidden text-center mb-4 pb-3 border-b-2 border-emerald-900">
-    <h1 class="text-2xl font-bold font-amiri text-emerald-900">منظومة جدول المدارسة وحفظ القرآن والأذكار الراتبة</h1>
-    <p class="text-xs text-slate-600 mt-1 font-semibold">
-      السنوسية (13.5 س) | تنقيح الفصول (11 س) | قصة الإيمان (5 س) | المنطق والمقولات (5 س) | مجلس عرض القرآن الأسبوعي الجمعة 8 ليلاً (1 س) — إجمالي: 35.5 ساعة
-    </p>
-  </div>
+  <!-- ════════════════════════════════════════════════════════════════
+       ██  HERO SECTION — واجهة الهبوط المتفاعلة
+       ════════════════════════════════════════════════════════════════ -->
+  <section id="heroSection" class="hero-gradient min-h-screen flex flex-col items-center justify-center relative px-4 py-12 sm:py-16">
+    
+    <!-- Geometric decorations -->
+    <div class="geo-pattern w-48 h-48 top-10 left-10 animate-pulse-soft"></div>
+    <div class="geo-pattern w-32 h-32 top-32 right-20 animate-pulse-soft" style="animation-delay: 1s;"></div>
+    <div class="geo-pattern w-64 h-64 bottom-20 left-1/4 animate-pulse-soft" style="animation-delay: 2s;"></div>
+    <div class="geo-pattern w-20 h-20 bottom-40 right-10 animate-pulse-soft" style="animation-delay: 0.5s;"></div>
 
-  <div class="max-w-6xl mx-auto space-y-4 sm:space-y-5">
-
-    <!-- شريط العنوان وأزرار التحكم العملية السريعة -->
-    <header class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-      <div>
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 rounded-2xl bg-emerald-900 text-amber-300 flex items-center justify-center font-bold text-2xl shadow">
-            📖
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="text-xl sm:text-2xl font-bold font-amiri text-emerald-950">جدول المدارسة وحفظ القرآن اليومي</h1>
-              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">البرنامج الشامل</span>
-            </div>
-            <p class="text-xs text-slate-500 font-medium mt-0.5">مدارسة علمية + إلقاء 5 آيات يومياً + أذكار الصباح والمساء جماعةً + عرض حفظ الأسبوع ليلة الجمعة</p>
-          </div>
-        </div>
+    <!-- Logo & Title -->
+    <div class="relative z-10 text-center animate-slide-up mb-8 sm:mb-10">
+      <div class="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-br from-joussour-gold to-joussour-goldDark shadow-2xl shadow-yellow-900/30 mb-5 animate-float">
+        <span class="text-3xl sm:text-4xl">📖</span>
       </div>
-
-      <div class="flex flex-wrap items-center gap-2 self-stretch md:self-auto justify-end">
-        <!-- مؤشر السحابة البسيط -->
-        <div id="cloudStatusBadge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200" title="قاعدة بيانات Firebase السحابية متصلة">
-          <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-          <span id="cloudStatusText">متصل بالسحابة</span>
-        </div>
-
-        <!-- زر تفعيل وضع التعديل السريع -->
-        <button id="toggleEditBtn" onclick="toggleEditMode()" class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
-          ✏️ <span id="editBtnLabel">تعديل سريع</span>
-        </button>
-
-        <!-- زر تحميل الجدول كصورة -->
-        <button onclick="downloadAsImage()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md transition transform active:scale-95">
-          🖼️ تحميل كصورة
-        </button>
-
-        <!-- زر الطباعة وحفظ PDF -->
-        <button onclick="downloadAsPDF()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-extrabold rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white shadow-md transition transform active:scale-95">
-          📑 طباعة / حفظ PDF
-        </button>
-
-        <!-- زر تصفير الأسبوع -->
-        <button onclick="resetWeeklyProgress()" class="p-2 text-slate-500 hover:text-amber-700 hover:bg-amber-50 rounded-xl transition" title="بدء أسبوع جديد وتصفير علامات الإنجاز">
-          🔄
-        </button>
-      </div>
-    </header>
-
-    <!-- شريط بارز جداً ومخصص لتحميل الجدول في جهازك -->
-    <div class="no-print bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 border-2 border-blue-400/40">
-      <div class="flex items-center gap-3 text-right">
-        <div class="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-2xl shadow">
-          📥
-        </div>
-        <div>
-          <h3 class="font-extrabold text-sm sm:text-base text-amber-300">تحميل الجدول وحفظه في جهازك فوراً:</h3>
-          <p class="text-xs text-blue-100 mt-0.5">اضغط على الزر الأصفر لتنزيل الجدول كصورة واضحة في هاتفك أو حاسوبك</p>
-        </div>
-      </div>
-      <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
-        <button onclick="downloadAsImage()" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-black rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 shadow-md transition transform hover:-translate-y-0.5 active:translate-y-0">
-          🖼️ اضغط هنا لتنزيل الجدول كصورة (PNG)
-        </button>
-        <button onclick="downloadAsPDF()" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-white/20 hover:bg-white/30 text-white border border-white/30 shadow transition">
-          📑 حفظ كـ PDF
-        </button>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-black font-amiri text-white leading-tight mb-3">
+        منظومة جدول المدارسة
+        <br>
+        <span class="text-joussour-gold">وحفظ القرآن والأذكار الراتبة</span>
+      </h1>
+      <p class="text-sm sm:text-base text-slate-400 max-w-xl mx-auto leading-relaxed">
+        مدارسة علمية يومية • إلقاء ٥ آيات • أذكار الصباح والمساء جماعةً • عرض حفظ الأسبوع ليلة الجمعة
+      </p>
+      <div class="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-joussour-gold/10 border border-joussour-gold/25 text-joussour-gold text-xs font-bold">
+        <span class="w-2 h-2 rounded-full bg-joussour-gold animate-pulse"></span>
+        نادي جسور العلمي — كلية العلوم الإسلامية، خروبة
       </div>
     </div>
 
-    <!-- بطاقات التوجيه الذهبي للأوراد الراتبة -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <!-- بطاقة القرآن اليومية -->
-      <div class="bg-gradient-to-r from-emerald-50 to-emerald-100/60 rounded-2xl p-3.5 border border-emerald-200 flex items-start gap-3">
-        <span class="text-2xl">📗</span>
+    <!-- ══ الحصة القادمة + العد التنازلي ══ -->
+    <div class="relative z-10 w-full max-w-2xl animate-slide-up" style="animation-delay: 0.3s;">
+      <div class="bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-5 sm:p-7 shadow-2xl">
+        
+        <!-- Next session header -->
+        <div class="flex items-center justify-between mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-joussour-gold/20 flex items-center justify-center">
+              <span class="text-lg">🎯</span>
+            </div>
+            <div>
+              <h2 class="text-white font-bold text-sm sm:text-base">الحصة القادمة</h2>
+              <p id="nextSessionName" class="text-joussour-gold text-xs font-bold mt-0.5">جارٍ التحديد...</p>
+            </div>
+          </div>
+          <div id="nextSessionTimeBadge" class="px-3 py-1.5 rounded-xl bg-joussour-gold/15 border border-joussour-gold/25 text-joussour-gold text-xs font-bold">
+            ⏰ <span id="nextSessionTime">--:--</span>
+          </div>
+        </div>
+
+        <!-- Countdown -->
+        <div class="grid grid-cols-4 gap-2 sm:gap-3 mb-5">
+          <div class="countdown-digit rounded-2xl p-3 sm:p-4 text-center">
+            <div id="cdDays" class="text-2xl sm:text-3xl font-black text-joussour-gold animate-count-glow font-cairo">0</div>
+            <div class="text-[10px] sm:text-xs text-slate-400 font-bold mt-1">يوم</div>
+          </div>
+          <div class="countdown-digit rounded-2xl p-3 sm:p-4 text-center">
+            <div id="cdHours" class="text-2xl sm:text-3xl font-black text-joussour-gold animate-count-glow font-cairo" style="animation-delay: 0.2s;">0</div>
+            <div class="text-[10px] sm:text-xs text-slate-400 font-bold mt-1">ساعة</div>
+          </div>
+          <div class="countdown-digit rounded-2xl p-3 sm:p-4 text-center">
+            <div id="cdMinutes" class="text-2xl sm:text-3xl font-black text-joussour-gold animate-count-glow font-cairo" style="animation-delay: 0.4s;">0</div>
+            <div class="text-[10px] sm:text-xs text-slate-400 font-bold mt-1">دقيقة</div>
+          </div>
+          <div class="countdown-digit rounded-2xl p-3 sm:p-4 text-center">
+            <div id="cdSeconds" class="text-2xl sm:text-3xl font-black text-joussour-gold animate-count-glow font-cairo" style="animation-delay: 0.6s;">0</div>
+            <div class="text-[10px] sm:text-xs text-slate-400 font-bold mt-1">ثانية</div>
+          </div>
+        </div>
+
+        <!-- Live status or in-session indicator -->
+        <div id="sessionStatusBar" class="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-joussour-gold/10 border border-joussour-gold/20">
+          <span class="w-2 h-2 rounded-full bg-joussour-gold animate-pulse"></span>
+          <span id="sessionStatusText" class="text-joussour-gold text-xs font-bold">جارٍ حساب الوقت المتبقي...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats summary in hero -->
+    <div class="relative z-10 w-full max-w-2xl mt-5 grid grid-cols-3 gap-2 sm:gap-3 animate-slide-up" style="animation-delay: 0.5s;">
+      <div class="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-3 sm:p-4 text-center">
+        <div class="text-xl sm:text-2xl font-black text-joussour-gold font-cairo">35.5</div>
+        <div class="text-[10px] sm:text-xs text-slate-400 font-bold">ساعة أسبوعياً</div>
+      </div>
+      <div class="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-3 sm:p-4 text-center">
+        <div class="text-xl sm:text-2xl font-black text-joussour-gold font-cairo">14</div>
+        <div class="text-[10px] sm:text-xs text-slate-400 font-bold">مجلساً وموعداً</div>
+      </div>
+      <div class="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-3 sm:p-4 text-center">
+        <div class="text-xl sm:text-2xl font-black text-joussour-gold font-cairo">35</div>
+        <div class="text-[10px] sm:text-xs text-slate-400 font-bold">آية / أسبوعياً</div>
+      </div>
+    </div>
+
+    <!-- Scroll down indicator -->
+    <a href="#scheduleSection" class="relative z-10 mt-8 sm:mt-10 flex flex-col items-center gap-2 text-slate-500 hover:text-joussour-gold transition group">
+      <span class="text-xs font-bold">اطلع على الجدول التفصيلي</span>
+      <svg class="w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+      </svg>
+    </a>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       ██  SCHEDULE SECTION — تفاصيل الجدول
+       ════════════════════════════════════════════════════════════════ -->
+  <div id="scheduleSection" class="p-2 sm:p-5">
+
+    <!-- ترويسة خاصة بالطباعة الورقية A4 -->
+    <div class="print-header hidden text-center mb-4 pb-3 border-b-2 border-emerald-900">
+      <h1 class="text-2xl font-bold font-amiri text-emerald-900">منظومة جدول المدارسة وحفظ القرآن والأذكار الراتبة</h1>
+      <p class="text-xs text-slate-600 mt-1 font-semibold">
+        السنوسية (13.5 س) | تنقيح الفصول (11 س) | قصة الإيمان (5 س) | المنطق والمقولات (5 س) | مجلس عرض القرآن الأسبوعي الجمعة 8 ليلاً (1 س) — إجمالي: 35.5 ساعة
+      </p>
+    </div>
+
+    <div class="max-w-6xl mx-auto space-y-4 sm:space-y-5">
+
+      <!-- شريط العنوان وأزرار التحكم -->
+      <header class="no-print bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <h4 class="text-xs sm:text-sm font-bold text-emerald-950">إلقاء القرآن الكريم (5 آيات يومياً)</h4>
-          <p class="text-[11px] text-emerald-800 mt-0.5 leading-relaxed">
-            يومياً صباحاً <strong>قبل انطلاق المجلس الصباحي</strong> [خمس آيات من القرآن الكريم حفظاً وإتقاناً].
-          </p>
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-joussour-black text-joussour-gold flex items-center justify-center font-bold text-2xl shadow">
+              📖
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 class="text-xl sm:text-2xl font-bold font-amiri text-slate-900">جدول المدارسة وحفظ القرآن اليومي</h1>
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300">البرنامج الشامل</span>
+              </div>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">مدارسة علمية + إلقاء 5 آيات يومياً + أذكار الصباح والمساء جماعةً + عرض حفظ الأسبوع ليلة الجمعة</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 self-stretch md:self-auto justify-end">
+          <!-- مؤشر السحابة -->
+          <div id="cloudStatusBadge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200" title="قاعدة بيانات Firebase السحابية متصلة">
+            <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+            <span id="cloudStatusText">متصل بالسحابة</span>
+          </div>
+
+          <!-- زر تعديل -->
+          <button id="toggleEditBtn" onclick="toggleEditMode()" class="flex items-center gap-1.5 px-3.5 py-1.5 text-xs sm:text-sm font-bold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+            ✏️ <span id="editBtnLabel">تعديل سريع</span>
+          </button>
+
+          <!-- زر تحميل كصورة -->
+          <button onclick="downloadAsImage()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-extrabold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-md transition transform active:scale-95">
+            🖼️ تحميل كصورة
+          </button>
+
+          <!-- زر الطباعة -->
+          <button onclick="downloadAsPDF()" class="flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-extrabold rounded-xl bg-joussour-black hover:bg-joussour-blackDeep text-joussour-gold shadow-md transition transform active:scale-95">
+            📑 طباعة / حفظ PDF
+          </button>
+
+          <!-- زر تصفير الأسبوع -->
+          <button onclick="resetWeeklyProgress()" class="p-2 text-slate-500 hover:text-amber-700 hover:bg-amber-50 rounded-xl transition" title="بدء أسبوع جديد وتصفير علامات الإنجاز">
+            🔄
+          </button>
+        </div>
+      </header>
+
+      <!-- شريط تحميل الجدول -->
+      <div class="no-print bg-gradient-to-r from-joussour-black via-joussour-blackLight to-joussour-black text-white rounded-2xl p-4 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-3 border border-joussour-gold/20">
+        <div class="flex items-center gap-3 text-right">
+          <div class="w-12 h-12 rounded-2xl bg-joussour-gold text-joussour-black flex items-center justify-center font-bold text-2xl shadow">
+            📥
+          </div>
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base text-joussour-gold">تحميل الجدول وحفظه في جهازك فوراً:</h3>
+            <p class="text-xs text-slate-400 mt-0.5">اضغط على الزر الذهبي لتنزيل الجدول كصورة واضحة في هاتفك أو حاسوبك</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+          <button onclick="downloadAsImage()" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-xs sm:text-sm font-black rounded-xl bg-joussour-gold hover:bg-joussour-goldDark text-joussour-black shadow-md transition transform hover:-translate-y-0.5 active:translate-y-0">
+            🖼️ اضغط هنا لتنزيل الجدول كصورة (PNG)
+          </button>
+          <button onclick="downloadAsPDF()" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow transition">
+            📑 حفظ كـ PDF
+          </button>
         </div>
       </div>
 
-      <!-- بطاقة أذكار الصباح والمساء الجماعية -->
-      <div class="bg-gradient-to-r from-amber-50 to-amber-100/60 rounded-2xl p-3.5 border border-amber-200 flex items-start gap-3">
-        <span class="text-2xl">🤲</span>
-        <div>
-          <h4 class="text-xs sm:text-sm font-bold text-amber-950">قراءة الأذكار الراتبة جماعةً</h4>
-          <p class="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
-            • <strong>أذكار الصباح:</strong> بعد أذان الفجر مباشرة جماعةً.<br>
-            • <strong>أذكار المساء:</strong> في مطلع وافتتاحية كل مجلس علمي مسائي.
-          </p>
+      <!-- بطاقات التوجيه الذهبي -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="bg-gradient-to-r from-emerald-50 to-emerald-100/60 rounded-2xl p-3.5 border border-emerald-200 flex items-start gap-3">
+          <span class="text-2xl">📗</span>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-emerald-950">إلقاء القرآن الكريم (5 آيات يومياً)</h4>
+            <p class="text-[11px] text-emerald-800 mt-0.5 leading-relaxed">
+              يومياً صباحاً <strong>قبل انطلاق المجلس الصباحي</strong> [خمس آيات من القرآن الكريم حفظاً وإتقاناً].
+            </p>
+          </div>
+        </div>
+        <div class="bg-gradient-to-r from-amber-50 to-amber-100/60 rounded-2xl p-3.5 border border-amber-200 flex items-start gap-3">
+          <span class="text-2xl">🤲</span>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-amber-950">قراءة الأذكار الراتبة جماعةً</h4>
+            <p class="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
+              • <strong>أذكار الصباح:</strong> بعد أذان الفجر مباشرة جماعةً.<br>
+              • <strong>أذكار المساء:</strong> في مطلع وافتتاحية كل مجلس علمي مسائي.
+            </p>
+          </div>
+        </div>
+        <div class="bg-gradient-to-r from-blue-50 to-blue-100/60 rounded-2xl p-3.5 border border-blue-200 flex items-start gap-3">
+          <span class="text-2xl">🌟</span>
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-blue-950">مجلس القرآن الأسبوعي الجامع</h4>
+            <p class="text-[11px] text-blue-800 mt-0.5 leading-relaxed">
+              <strong>ليلة الجمعة الساعة 08:00 ليلاً:</strong> إلقاء وعرض كامل ما حُفِظ طيلة الأسبوع من القرآن الكريم.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- لوحة الإحصائيات -->
+      <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-500">إجمالي ساعات الأسبوع</span>
+          <div class="my-1 flex items-baseline gap-1">
+            <span id="statTotalHours" class="text-2xl sm:text-3xl font-extrabold text-slate-900">35.5</span>
+            <span class="text-xs font-semibold text-slate-500">ساعة</span>
+          </div>
+          <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md self-start">14 مجلساً وموعداً</span>
+        </div>
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-500">الساعات المنجزة فعلياً</span>
+          <div class="my-1 flex items-baseline gap-1">
+            <span id="statDoneHours" class="text-2xl sm:text-3xl font-extrabold text-emerald-700">0.0</span>
+            <span class="text-xs font-semibold text-slate-500">من 35.5 س</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+            <div id="statHoursProgressBar" class="bg-joussour-gold h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-bold text-slate-500">المجالس والأنشطة المنفذة</span>
+          <div class="my-1 flex items-baseline gap-1">
+            <span id="statDoneLessons" class="text-2xl sm:text-3xl font-extrabold text-blue-700">0</span>
+            <span class="text-xs font-semibold text-slate-500">من 14 موعداً</span>
+          </div>
+          <span id="statPercentageBadge" class="text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md self-start">0% إنجاز</span>
+        </div>
+        <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
+          <span class="text-xs font-bold text-emerald-900">مستهدف القرآن الكريم</span>
+          <div class="my-1 flex items-baseline gap-1">
+            <span class="text-2xl sm:text-3xl font-extrabold text-emerald-700">35</span>
+            <span class="text-xs font-semibold text-slate-500">آية / أسبوعياً</span>
+          </div>
+          <span class="text-[11px] font-medium text-emerald-800">5 آيات × 7 أيام + مجلس العرض</span>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════════════════════
+           ██  مؤشر الشهر والأسبوع — قبل الجدول مباشرة
+           ════════════════════════════════════════════════════════════ -->
+      <div id="weekContextBanner" class="relative bg-gradient-to-r from-joussour-black via-joussour-blackLight to-joussour-black rounded-2xl p-4 sm:p-5 border border-joussour-gold/20 overflow-hidden">
+        <!-- shimmer effect -->
+        <div class="absolute inset-0 shimmer-bg animate-shimmer pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-joussour-gold/15 border border-joussour-gold/25 flex items-center justify-center">
+              <span class="text-xl">📅</span>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 id="currentMonthLabel" class="text-joussour-gold font-bold text-base sm:text-lg font-amiri">...</h3>
+                <span class="text-slate-500 text-xs">|</span>
+                <span id="currentYearLabel" class="text-slate-400 text-xs font-bold">...</span>
+              </div>
+              <p id="currentWeekLabel" class="text-slate-400 text-xs font-bold mt-0.5">...</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="px-3 py-1.5 rounded-xl bg-joussour-gold/10 border border-joussour-gold/20">
+              <span id="currentDayFull" class="text-joussour-gold text-xs font-bold">...</span>
+            </div>
+            <div class="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
+              <span id="currentDateFull" class="text-slate-300 text-xs font-bold font-cairo">...</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- بطاقة مجلس الجمعة الأسبوعي للقرآن -->
-      <div class="bg-gradient-to-r from-blue-50 to-blue-100/60 rounded-2xl p-3.5 border border-blue-200 flex items-start gap-3">
-        <span class="text-2xl">🌟</span>
-        <div>
-          <h4 class="text-xs sm:text-sm font-bold text-blue-950">مجلس القرآن الأسبوعي الجامع</h4>
-          <p class="text-[11px] text-blue-800 mt-0.5 leading-relaxed">
-            <strong>ليلة الجمعة الساعة 08:00 ليلاً:</strong> إلقاء وعرض كامل ما حُفِظ طيلة الأسبوع من القرآن الكريم.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- لوحة الإحصائيات العملية البسيطة والمباشرة -->
-    <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <!-- إجمالي الساعات المقررة -->
-      <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
-        <span class="text-xs font-bold text-slate-500">إجمالي ساعات الأسبوع</span>
-        <div class="my-1 flex items-baseline gap-1">
-          <span id="statTotalHours" class="text-2xl sm:text-3xl font-extrabold text-slate-900">35.5</span>
-          <span class="text-xs font-semibold text-slate-500">ساعة</span>
-        </div>
-        <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md self-start">14 مجلساً وموعداً</span>
-      </div>
-
-      <!-- الساعات المنجزة فعلياً -->
-      <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
-        <span class="text-xs font-bold text-slate-500">الساعات المنجزة فعلياً</span>
-        <div class="my-1 flex items-baseline gap-1">
-          <span id="statDoneHours" class="text-2xl sm:text-3xl font-extrabold text-emerald-700">0.0</span>
-          <span class="text-xs font-semibold text-slate-500">من 35.5 س</span>
-        </div>
-        <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-          <div id="statHoursProgressBar" class="bg-emerald-600 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-        </div>
-      </div>
-
-      <!-- عدد المجالس والدروس المنجزة -->
-      <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
-        <span class="text-xs font-bold text-slate-500">المجالس والأنشطة المنفذة</span>
-        <div class="my-1 flex items-baseline gap-1">
-          <span id="statDoneLessons" class="text-2xl sm:text-3xl font-extrabold text-blue-700">0</span>
-          <span class="text-xs font-semibold text-slate-500">من 14 موعداً</span>
-        </div>
-        <span id="statPercentageBadge" class="text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md self-start">0% إنجاز</span>
-      </div>
-
-      <!-- تتبع حفظ القرآن للأسبوع -->
-      <div class="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col justify-between">
-        <span class="text-xs font-bold text-emerald-900">مستهدف القرآن الكريم</span>
-        <div class="my-1 flex items-baseline gap-1">
-          <span class="text-2xl sm:text-3xl font-extrabold text-emerald-700">35</span>
-          <span class="text-xs font-semibold text-slate-500">آية / أسبوعياً</span>
-        </div>
-        <span class="text-[11px] font-medium text-emerald-800">5 آيات × 7 أيام + مجلس العرض</span>
-      </div>
-    </section>
-
-    <!-- الجدول العملي المنظم لكل أيام الأسبوع (من السبت إلى الجمعة) -->
-    <main class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-shadow-none">
-      
-      <!-- شريط توجيهي عملي -->
-      <div class="no-print bg-emerald-900 text-white px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-medium">
-        <div class="flex items-center gap-2">
-          <span>💡</span>
-          <span>
-            <strong>نظام التتبع المباشر:</strong> اضغط على <strong>[⚪ ضع علامة إنجاز]</strong> عند إتمام أي درس أو ورد قرآني ليتحول إلى <strong>[✅ مكتمل]</strong> وتُحسب ساعاته فوراً.
+      <!-- الجدول العملي لأيام الأسبوع -->
+      <main id="scheduleTableMain" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden print-shadow-none">
+        
+        <!-- شريط توجيهي -->
+        <div class="no-print bg-joussour-black text-white px-4 sm:px-5 py-2.5 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-medium">
+          <div class="flex items-center gap-2">
+            <span>💡</span>
+            <span>
+              <strong>نظام التتبع المباشر:</strong> اضغط على <strong>[⚪ ضع علامة إنجاز]</strong> عند إتمام أي درس أو ورد قرآني ليتحول إلى <strong>[✅ مكتمل]</strong> وتُحسب ساعاته فوراً.
+            </span>
+          </div>
+          <span id="todayIndicator" class="bg-joussour-gold/20 text-joussour-gold font-bold px-3 py-1 rounded-lg border border-joussour-gold/30 whitespace-nowrap">
+            اليوم الحالي: جاري التحديد...
           </span>
         </div>
-        <span id="todayIndicator" class="bg-emerald-800 text-amber-300 font-bold px-3 py-1 rounded-lg border border-emerald-700 whitespace-nowrap">
-          اليوم الحالي: جاري التحديد...
-        </span>
-      </div>
 
-      <!-- الجدول الأسبوعي الأساسي -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-right border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs sm:text-sm font-bold">
-              <th class="p-3 sm:p-4 w-28 sm:w-32 text-center border-l border-slate-200">اليوم</th>
-              <th class="p-3 sm:p-4 border-l border-slate-200">الفترة الصباحية ☀️ (القرآن + المدارسة + أذكار الفجر)</th>
-              <th class="p-3 sm:p-4 border-l border-slate-200">الفترة المسائية 🌙 (أذكار المساء + المقرر العلمي)</th>
-              <th class="p-3 sm:p-4 w-24 sm:w-28 text-center">مجموع اليوم</th>
-            </tr>
-          </thead>
-          <tbody id="scheduleTableBody" class="divide-y divide-slate-200 text-xs sm:text-sm">
-            <!-- يتم تعبئة صفوف الأيام السبعة ديناميكياً مع كافة بياناتها -->
-          </tbody>
-        </table>
-      </div>
-    </main>
+        <!-- الجدول -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs sm:text-sm font-bold">
+                <th class="p-3 sm:p-4 w-28 sm:w-32 text-center border-l border-slate-200">اليوم</th>
+                <th class="p-3 sm:p-4 border-l border-slate-200">الفترة الصباحية ☀️ (القرآن + المدارسة + أذكار الفجر)</th>
+                <th class="p-3 sm:p-4 border-l border-slate-200">الفترة المسائية 🌙 (أذكار المساء + المقرر العلمي)</th>
+                <th class="p-3 sm:p-4 w-24 sm:w-28 text-center">مجموع اليوم</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTableBody" class="divide-y divide-slate-200 text-xs sm:text-sm">
+              <!-- يتم تعبئة صفوف الأيام السبعة ديناميكياً -->
+            </tbody>
+          </table>
+        </div>
+      </main>
 
-    <!-- بطاقة الملخص الأسبوعي للمقررات والأوراد المعتمدة -->
-    <section class="bg-slate-100/80 rounded-2xl p-4 sm:p-5 border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-3">
-      <h3 class="font-bold text-slate-900 font-amiri text-base sm:text-lg flex items-center gap-2">
-        <span>📚</span> ملخص المقررات وتوزيع ساعاتها وأورادها الأسبوعية:
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div class="p-3 bg-white rounded-xl border border-slate-200">
-          <strong class="text-emerald-900">1. العقيدة السنوسية (أم البراهين):</strong>
-          <p class="text-xs text-slate-600 mt-1">4 مجالس صباحية (السبت، الإثنين، الأربعاء، الخميس) = <strong>13.5 ساعة</strong></p>
+      <!-- بطاقة ملخص المقررات -->
+      <section class="bg-slate-100/80 rounded-2xl p-4 sm:p-5 border border-slate-200 text-xs sm:text-sm text-slate-700 space-y-3">
+        <h3 class="font-bold text-slate-900 font-amiri text-base sm:text-lg flex items-center gap-2">
+          <span>📚</span> ملخص المقررات وتوزيع ساعاتها وأورادها الأسبوعية:
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div class="p-3 bg-white rounded-xl border border-slate-200">
+            <strong class="text-emerald-900">1. العقيدة السنوسية (أم البراهين):</strong>
+            <p class="text-xs text-slate-600 mt-1">4 مجالس صباحية (السبت، الإثنين، الأربعاء، الخميس) = <strong>13.5 ساعة</strong></p>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-slate-200">
+            <strong class="text-amber-900">2. تنقيح الفصول في الأصول (القرافي):</strong>
+            <p class="text-xs text-slate-600 mt-1">3 مجالس صباحية (الأحد، الثلاثاء، الجمعة) = <strong>11.0 ساعة</strong></p>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-slate-200">
+            <strong class="text-blue-900">3. قصة الإيمان (الشيخ نديم الجسر):</strong>
+            <p class="text-xs text-slate-600 mt-1">4 مجالس مسائية (السبت 1س، الأحد 1س، الثلاثاء 1س، الخميس 2س) = <strong>5.0 ساعات</strong></p>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-slate-200">
+            <strong class="text-purple-900">4. علم المنطق وتحرير القواعد:</strong>
+            <p class="text-xs text-slate-600 mt-1">مساء الأربعاء [06:00 م - 08:00 م] = <strong>ساعتان (2.0 س)</strong></p>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-slate-200">
+            <strong class="text-cyan-900">5. مراجعة المقولات والحصة الأسبوعية:</strong>
+            <p class="text-xs text-slate-600 mt-1">ظهر ومساء الجمعة [02:00 م - 05:00 م] = <strong>3.0 ساعات</strong></p>
+          </div>
+          <div class="p-3 bg-white rounded-xl border border-emerald-200 bg-emerald-50/40">
+            <strong class="text-emerald-950">6. مجلس القرآن الأسبوعي الجامع:</strong>
+            <p class="text-xs text-emerald-800 mt-1">ليلة الجمعة [08:00 م - 09:00 م]: عرض كامل حفظ الأسبوع = <strong>ساعة (1.0 س)</strong></p>
+          </div>
         </div>
-        <div class="p-3 bg-white rounded-xl border border-slate-200">
-          <strong class="text-amber-900">2. تنقيح الفصول في الأصول (القرافي):</strong>
-          <p class="text-xs text-slate-600 mt-1">3 مجالس صباحية (الأحد، الثلاثاء، الجمعة) = <strong>11.0 ساعة</strong></p>
-        </div>
-        <div class="p-3 bg-white rounded-xl border border-slate-200">
-          <strong class="text-blue-900">3. قصة الإيمان (الشيخ نديم الجسر):</strong>
-          <p class="text-xs text-slate-600 mt-1">4 مجالس مسائية (السبت 1س، الأحد 1س، الثلاثاء 1س، الخميس 2س) = <strong>5.0 ساعات</strong></p>
-        </div>
-        <div class="p-3 bg-white rounded-xl border border-slate-200">
-          <strong class="text-purple-900">4. علم المنطق وتحرير القواعد:</strong>
-          <p class="text-xs text-slate-600 mt-1">مساء الأربعاء [06:00 م - 08:00 م] = <strong>ساعتان (2.0 س)</strong></p>
-        </div>
-        <div class="p-3 bg-white rounded-xl border border-slate-200">
-          <strong class="text-cyan-900">5. مراجعة المقولات والحصة الأسبوعية:</strong>
-          <p class="text-xs text-slate-600 mt-1">ظهر ومساء الجمعة [02:00 م - 05:00 م] = <strong>3.0 ساعات</strong></p>
-        </div>
-        <div class="p-3 bg-white rounded-xl border border-emerald-200 bg-emerald-50/40">
-          <strong class="text-emerald-950">6. مجلس القرآن الأسبوعي الجامع:</strong>
-          <p class="text-xs text-emerald-800 mt-1">ليلة الجمعة [08:00 م - 09:00 م]: عرض كامل حفظ الأسبوع = <strong>ساعة (1.0 س)</strong></p>
-        </div>
-      </div>
-    </section>
+      </section>
 
+      <!-- Footer -->
+      <footer class="no-print text-center py-4 text-xs text-slate-400">
+        <p class="font-bold">نادي جسور العلمي — جسور نحو أفق الفكر والمعرفة</p>
+        <p class="mt-0.5">كلية العلوم الإسلامية، خروبة — جامعة الجزائر ١</p>
+      </footer>
+
+    </div>
   </div>
 
-  <!-- المنطق البرمجي العملي وإدارة البيانات السحابية والمحلية -->
+  <!-- ════════════════════════════════════════════════════════════════
+       ██  JAVASCRIPT — المنطق البرمجي
+       ════════════════════════════════════════════════════════════════ -->
   <script>
-    // إعدادات Firebase
+    // ─── Firebase ───
     const firebaseConfig = {
       apiKey: "AIzaSyCWdABh8Ho-J5hjF-1AqnAY2gU37vj3HX4",
       authDomain: "josour-moidat.firebaseapp.com",
@@ -299,155 +531,121 @@
       console.warn("Firebase Init Note:", e);
     }
 
-    // جدول البيانات الكامل والمملوء مسبقاً بدقة شاملاً القرآن والأذكار والمقررات
+    // ─── بيانات الجدول ───
     const INITIAL_DAYS = [
       {
-        dayName: 'السبت',
-        dayKey: 'sat',
+        dayName: 'السبت', dayKey: 'sat',
         morning: {
-          id: 'sat_m',
-          title: 'العقيدة السنوسية (أم البراهين)',
-          timeText: '04:00 ص - 06:30 ص',
-          hours: 2.5,
-          done: false,
+          id: 'sat_m', title: 'العقيدة السنوسية (أم البراهين)',
+          timeText: '04:00 ص - 06:30 ص', startHour: 4, startMin: 0, endHour: 6, endMin: 30,
+          hours: 2.5, done: false,
           quranRoutine: 'إلقاء 5 آيات من القرآن الكريم قبل بداية المجلس',
           adhkarRoutine: 'أذكار الصباح جماعةً بعد أذان الفجر مباشرة'
         },
         evening: {
-          id: 'sat_e',
-          title: 'قراءة كتاب «قصة الإيمان» لنديم الجسر',
-          timeText: '08:00 م - 09:00 م',
-          hours: 1.0,
-          done: false,
+          id: 'sat_e', title: 'قراءة كتاب «قصة الإيمان» لنديم الجسر',
+          timeText: '08:00 م - 09:00 م', startHour: 20, startMin: 0, endHour: 21, endMin: 0,
+          hours: 1.0, done: false,
           adhkarRoutine: 'قراءة أذكار المساء جماعةً في مطلع وافتتاح المجلس'
         }
       },
       {
-        dayName: 'الأحد',
-        dayKey: 'sun',
+        dayName: 'الأحد', dayKey: 'sun',
         morning: {
-          id: 'sun_m',
-          title: 'تنقيح الفصول في الأصول للإمام القرافي',
-          timeText: '04:00 ص - 07:00 ص',
-          hours: 3.0,
-          done: false,
+          id: 'sun_m', title: 'تنقيح الفصول في الأصول للإمام القرافي',
+          timeText: '04:00 ص - 07:00 ص', startHour: 4, startMin: 0, endHour: 7, endMin: 0,
+          hours: 3.0, done: false,
           quranRoutine: 'إلقاء 5 آيات من القرآن الكريم قبل بداية المجلس',
           adhkarRoutine: 'أذكار الصباح جماعةً بعد أذان الفجر مباشرة'
         },
         evening: {
-          id: 'sun_e',
-          title: 'قراءة كتاب «قصة الإيمان» لنديم الجسر',
-          timeText: '08:00 م - 09:00 م',
-          hours: 1.0,
-          done: false,
+          id: 'sun_e', title: 'قراءة كتاب «قصة الإيمان» لنديم الجسر',
+          timeText: '08:00 م - 09:00 م', startHour: 20, startMin: 0, endHour: 21, endMin: 0,
+          hours: 1.0, done: false,
           adhkarRoutine: 'قراءة أذكار المساء جماعةً في مطلع وافتتاح المجلس'
         }
       },
       {
-        dayName: 'الإثنين',
-        dayKey: 'mon',
+        dayName: 'الإثنين', dayKey: 'mon',
         morning: {
-          id: 'mon_m',
-          title: 'العقيدة السنوسية (أم البراهين)',
-          timeText: '04:00 ص - 07:00 ص',
-          hours: 3.0,
-          done: false,
+          id: 'mon_m', title: 'العقيدة السنوسية (أم البراهين)',
+          timeText: '04:00 ص - 07:00 ص', startHour: 4, startMin: 0, endHour: 7, endMin: 0,
+          hours: 3.0, done: false,
           quranRoutine: 'إلقاء 5 آيات من القرآن الكريم قبل بداية المجلس',
           adhkarRoutine: 'أذكار الصباح جماعةً بعد أذان الفجر مباشرة'
         },
         evening: {
-          id: 'mon_e',
-          title: 'استدراك وقراءة حرة ومراجعة ذاتية',
-          timeText: 'مساءً',
-          hours: 0.0,
-          done: false,
+          id: 'mon_e', title: 'استدراك وقراءة حرة ومراجعة ذاتية',
+          timeText: 'مساءً', startHour: 20, startMin: 0, endHour: 20, endMin: 0,
+          hours: 0.0, done: false,
           adhkarRoutine: 'أذكار المساء الراتبة'
         }
       },
       {
-        dayName: 'الثلاثاء',
-        dayKey: 'tue',
+        dayName: 'الثلاثاء', dayKey: 'tue',
         morning: {
-          id: 'tue_m',
-          title: 'تنقيح الفصول في الأصول للإمام القرافي',
-          timeText: '04:00 ص - 07:00 ص',
-          hours: 3.0,
-          done: false,
+          id: 'tue_m', title: 'تنقيح الفصول في الأصول للإمام القرافي',
+          timeText: '04:00 ص - 07:00 ص', startHour: 4, startMin: 0, endHour: 7, endMin: 0,
+          hours: 3.0, done: false,
           quranRoutine: 'إلقاء 5 آيات من القرآن الكريم قبل بداية المجلس',
           adhkarRoutine: 'أذكار الصباح جماعةً بعد أذان الفجر مباشرة'
         },
         evening: {
-          id: 'tue_e',
-          title: 'قراءة كتاب «قصة الإيمان» لنديم الجسر',
-          timeText: '08:00 م - 09:00 م',
-          hours: 1.0,
-          done: false,
+          id: 'tue_e', title: 'قراءة كتاب «قصة الإيمان» لنديم الجسر',
+          timeText: '08:00 م - 09:00 م', startHour: 20, startMin: 0, endHour: 21, endMin: 0,
+          hours: 1.0, done: false,
           adhkarRoutine: 'قراءة أذكار المساء جماعةً في مطلع وافتتاح المجلس'
         }
       },
       {
-        dayName: 'الأربعاء',
-        dayKey: 'wed',
+        dayName: 'الأربعاء', dayKey: 'wed',
         morning: {
-          id: 'wed_m',
-          title: 'العقيدة السنوسية (مجلس موسع ومكثف)',
-          timeText: '04:00 ص - 09:00 ص',
-          hours: 5.0,
-          done: false,
+          id: 'wed_m', title: 'العقيدة السنوسية (مجلس موسع ومكثف)',
+          timeText: '04:00 ص - 09:00 ص', startHour: 4, startMin: 0, endHour: 9, endMin: 0,
+          hours: 5.0, done: false,
           quranRoutine: 'إلقاء 5 آيات من القرآن الكريم قبل بداية المجلس',
           adhkarRoutine: 'أذكار الصباح جماعةً بعد أذان الفجر مباشرة'
         },
         evening: {
-          id: 'wed_e',
-          title: 'علم المنطق وتحرير القواعد والمباحث',
-          timeText: '06:00 م - 08:00 م',
-          hours: 2.0,
-          done: false,
+          id: 'wed_e', title: 'علم المنطق وتحرير القواعد والمباحث',
+          timeText: '06:00 م - 08:00 م', startHour: 18, startMin: 0, endHour: 20, endMin: 0,
+          hours: 2.0, done: false,
           adhkarRoutine: 'قراءة أذكار المساء جماعةً في مطلع وافتتاح المجلس'
         }
       },
       {
-        dayName: 'الخميس',
-        dayKey: 'thu',
+        dayName: 'الخميس', dayKey: 'thu',
         morning: {
-          id: 'thu_m',
-          title: 'العقيدة السنوسية (بدأنا الخميس بالسنوسية لضبط التثبيت)',
-          timeText: '04:00 ص - 07:00 ص',
-          hours: 3.0,
-          done: false,
+          id: 'thu_m', title: 'العقيدة السنوسية (بدأنا الخميس بالسنوسية لضبط التثبيت)',
+          timeText: '04:00 ص - 07:00 ص', startHour: 4, startMin: 0, endHour: 7, endMin: 0,
+          hours: 3.0, done: false,
           quranRoutine: 'إلقاء 5 آيات من القرآن الكريم قبل بداية المجلس',
           adhkarRoutine: 'أذكار الصباح جماعةً بعد أذان الفجر مباشرة'
         },
         evening: {
-          id: 'thu_e',
-          title: 'قراءة كتاب «قصة الإيمان» لنديم الجسر',
-          timeText: '06:00 م - 08:00 م',
-          hours: 2.0,
-          done: false,
+          id: 'thu_e', title: 'قراءة كتاب «قصة الإيمان» لنديم الجسر',
+          timeText: '06:00 م - 08:00 م', startHour: 18, startMin: 0, endHour: 20, endMin: 0,
+          hours: 2.0, done: false,
           adhkarRoutine: 'قراءة أذكار المساء جماعةً في مطلع وافتتاح المجلس'
         }
       },
       {
-        dayName: 'الجمعة',
-        dayKey: 'fri',
+        dayName: 'الجمعة', dayKey: 'fri',
         morning: {
-          id: 'fri_m',
-          title: 'تنقيح الفصول في الأصول (مجلس موسع ومكثف)',
-          timeText: '04:00 ص - 09:00 ص',
-          hours: 5.0,
-          done: false,
+          id: 'fri_m', title: 'تنقيح الفصول في الأصول (مجلس موسع ومكثف)',
+          timeText: '04:00 ص - 09:00 ص', startHour: 4, startMin: 0, endHour: 9, endMin: 0,
+          hours: 5.0, done: false,
           quranRoutine: 'إلقاء 5 آيات من القرآن الكريم (خاتمة آيات الأسبوع)',
           adhkarRoutine: 'أذكار الصباح جماعةً بعد أذان الفجر مباشرة'
         },
         evening: {
-          id: 'fri_e',
-          title: 'مراجعة المقولات العشر وتحضير الحصة الأسبوعية',
-          timeText: '02:00 م - 05:00 م',
-          hours: 3.0,
-          done: false,
+          id: 'fri_e', title: 'مراجعة المقولات العشر وتحضير الحصة الأسبوعية',
+          timeText: '02:00 م - 05:00 م', startHour: 14, startMin: 0, endHour: 17, endMin: 0,
+          hours: 3.0, done: false,
           specialNightSession: {
             title: '🌟 مجلس القرآن الأسبوعي: إلقاء وعرض كل ما حُفظ طيلة الأسبوع',
             timeText: '08:00 م - 09:00 م (ليلاً)',
+            startHour: 20, startMin: 0, endHour: 21, endMin: 0,
             hours: 1.0,
             done: false
           }
@@ -458,23 +656,195 @@
     let scheduleData = [];
     let isEditMode = false;
 
-    // استرجاع البيانات عند الفتح
+    // ─── خريطة الأيام: JS dayIndex → dayKey ───
+    // JS: 0=Sunday, 1=Monday, ..., 6=Saturday
+    const JS_DAY_TO_KEY = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const ARABIC_DAY_NAMES = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    // ترتيب الأسبوع في الجدول: السبت أولاً
+    const WEEK_ORDER = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+
+    // ─── ترتيب جميع الحصص زمنياً لحساب الحصة القادمة ───
+    function buildAllSessions() {
+      const sessions = [];
+      INITIAL_DAYS.forEach((day, idx) => {
+        const dayKeyIdx = WEEK_ORDER.indexOf(day.dayKey);
+        if (day.morning && day.morning.hours > 0) {
+          sessions.push({
+            dayKey: day.dayKey, dayName: day.dayName, dayOrderIdx: dayKeyIdx,
+            title: day.morning.title, period: 'صباحية',
+            startHour: day.morning.startHour, startMin: day.morning.startMin,
+            endHour: day.morning.endHour, endMin: day.morning.endMin,
+          });
+        }
+        if (day.evening && day.evening.hours > 0) {
+          sessions.push({
+            dayKey: day.dayKey, dayName: day.dayName, dayOrderIdx: dayKeyIdx,
+            title: day.evening.title, period: 'مسائية',
+            startHour: day.evening.startHour, startMin: day.evening.startMin,
+            endHour: day.evening.endHour, endMin: day.evening.endMin,
+          });
+        }
+        if (day.evening && day.evening.specialNightSession && day.evening.specialNightSession.hours > 0) {
+          const sn = day.evening.specialNightSession;
+          sessions.push({
+            dayKey: day.dayKey, dayName: day.dayName, dayOrderIdx: dayKeyIdx,
+            title: sn.title.replace('🌟 ', ''), period: 'ليلية',
+            startHour: sn.startHour, startMin: sn.startMin,
+            endHour: sn.endHour, endMin: sn.endMin,
+          });
+        }
+      });
+      return sessions;
+    }
+    const ALL_SESSIONS = buildAllSessions();
+
+    // ─── حساب الحصة القادمة والعد التنازلي ───
+    function getNextSession() {
+      const now = new Date();
+      const nowDayJS = now.getDay(); // 0=Sun...6=Sat
+      const nowKey = JS_DAY_TO_KEY[nowDayJS];
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+      // ابحث في الأسبوع الحالي بدءاً من اليوم
+      // نبني قائمة مرتبة: اليوم الحالي ← نهاية الأسبوع ← بداية الأسبوع
+      let orderedDays = [];
+      const todayOrderIdx = WEEK_ORDER.indexOf(nowKey);
+      for (let i = 0; i < 7; i++) {
+        orderedDays.push(WEEK_ORDER[(todayOrderIdx + i) % 7]);
+      }
+
+      for (let d = 0; d < orderedDays.length; d++) {
+        const dk = orderedDays[d];
+        // الحصص لهذا اليوم مرتبة زمنياً
+        const daySessions = ALL_SESSIONS
+          .filter(s => s.dayKey === dk)
+          .sort((a, b) => (a.startHour * 60 + a.startMin) - (b.startHour * 60 + b.startMin));
+
+        for (const session of daySessions) {
+          const sessionStart = session.startHour * 60 + session.startMin;
+          const sessionEnd = session.endHour * 60 + session.endMin;
+          
+          if (d === 0) {
+            // اليوم نفسه: الحصة التي لم تنتهِ بعد أو لم تبدأ
+            if (nowMinutes < sessionEnd) {
+              // هل نحن داخل الحصة (بدأت ولم تنتهِ)؟
+              const isLive = nowMinutes >= sessionStart && nowMinutes < sessionEnd;
+              // حساب الفرق للبداية
+              const diffMs = isLive 
+                ? (sessionEnd - nowMinutes) * 60 * 1000  // ما بقي لنهاية الحصة الحالية
+                : (sessionStart - nowMinutes) * 60 * 1000; // ما بقي لبدايتها
+              return { session, diffMs, isLive, targetMinute: isLive ? sessionEnd : sessionStart };
+            }
+          } else {
+            // يوم لاحق: نحسب الفرق بالأيام
+            const targetDate = new Date(now);
+            targetDate.setDate(targetDate.getDate() + d);
+            targetDate.setHours(session.startHour, session.startMin, 0, 0);
+            const diffMs = targetDate.getTime() - now.getTime();
+            return { session, diffMs, isLive: false };
+          }
+        }
+      }
+      // Fallback
+      return null;
+    }
+
+    function updateCountdown() {
+      const result = getNextSession();
+      if (!result) return;
+
+      const { session, diffMs, isLive } = result;
+      const nameEl = document.getElementById('nextSessionName');
+      const timeEl = document.getElementById('nextSessionTime');
+      const statusEl = document.getElementById('sessionStatusText');
+      const statusBar = document.getElementById('sessionStatusBar');
+
+      // اسم الحصة واليوم
+      nameEl.textContent = `${session.title}`;
+      const startStr = `${String(session.startHour).padStart(2,'0')}:${String(session.startMin).padStart(2,'0')}`;
+      const endStr = `${String(session.endHour).padStart(2,'0')}:${String(session.endMin).padStart(2,'0')}`;
+      timeEl.textContent = `${session.dayName} ${startStr} — ${endStr}`;
+
+      if (isLive) {
+        // نحن داخل حصة الآن!
+        statusBar.className = 'flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-emerald-500/20 border border-emerald-400/30';
+        statusEl.className = 'text-emerald-400 text-xs font-bold';
+        statusEl.textContent = `🔴 الحصة جارية الآن! • ينتهي بعد ${formatDiff(diffMs)}`;
+        // العد التنازلي لنهاية الحصة
+        setCountdownDigits(diffMs);
+      } else {
+        statusBar.className = 'flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-joussour-gold/10 border border-joussour-gold/20';
+        statusEl.className = 'text-joussour-gold text-xs font-bold';
+        statusEl.textContent = `تبدأ بعد ${formatDiff(diffMs)}`;
+        setCountdownDigits(diffMs);
+      }
+    }
+
+    function setCountdownDigits(ms) {
+      if (ms < 0) ms = 0;
+      const totalSec = Math.floor(ms / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const minutes = Math.floor((totalSec % 3600) / 60);
+      const seconds = totalSec % 60;
+
+      document.getElementById('cdDays').textContent = days;
+      document.getElementById('cdHours').textContent = hours;
+      document.getElementById('cdMinutes').textContent = String(minutes).padStart(2, '0');
+      document.getElementById('cdSeconds').textContent = String(seconds).padStart(2, '0');
+    }
+
+    function formatDiff(ms) {
+      if (ms < 0) return '٠';
+      const totalMin = Math.floor(ms / 60000);
+      if (totalMin < 60) return `${totalMin} دقيقة`;
+      const h = Math.floor(totalMin / 60);
+      const m = totalMin % 60;
+      if (h < 24) return m > 0 ? `${h} ساعة و ${m} دقيقة` : `${h} ساعة`;
+      const d = Math.floor(h / 24);
+      const rh = h % 24;
+      return rh > 0 ? `${d} يوم و ${rh} ساعة` : `${d} يوم`;
+    }
+
+    // ─── مؤشر الشهر والأسبوع ───
+    function updateWeekContext() {
+      const now = new Date();
+      const arabicMonths = [
+        'جانفي', 'فيفري', 'مارس', 'أفريل', 'ماي', 'جوان',
+        'جويلية', 'أوت', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+      ];
+      
+      // رقم الأسبوع في الشهر
+      const dayOfMonth = now.getDate();
+      const weekNum = Math.ceil(dayOfMonth / 7);
+      const weekLabels = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس'];
+      
+      document.getElementById('currentMonthLabel').textContent = `شهر ${arabicMonths[now.getMonth()]}`;
+      document.getElementById('currentYearLabel').textContent = `${now.getFullYear()} م`;
+      document.getElementById('currentWeekLabel').textContent = `الأسبوع ${weekLabels[weekNum - 1] || weekNum} من الشهر`;
+      document.getElementById('currentDayFull').textContent = `📍 ${ARABIC_DAY_NAMES[now.getDay()]}`;
+      document.getElementById('currentDateFull').textContent = `${dayOfMonth} ${arabicMonths[now.getMonth()]} ${now.getFullYear()}`;
+    }
+
+    // ─── البيانات ───
     function loadData() {
       const saved = localStorage.getItem('joussour_practical_schedule_v2');
       if (saved) {
-        try {
-          scheduleData = JSON.parse(saved);
-        } catch (e) {
-          scheduleData = JSON.parse(JSON.stringify(INITIAL_DAYS));
-        }
+        try { scheduleData = JSON.parse(saved); }
+        catch (e) { scheduleData = JSON.parse(JSON.stringify(INITIAL_DAYS)); }
       } else {
         scheduleData = JSON.parse(JSON.stringify(INITIAL_DAYS));
       }
       renderTable();
       updateDashboard();
       detectCurrentDay();
+      updateWeekContext();
+      updateCountdown();
 
-      // الاتصال الحي بـ Firebase في الخلفية
+      // مؤقت العد التنازلي: كل ثانية
+      setInterval(updateCountdown, 1000);
+
+      // Firebase
       if (db) {
         db.collection('study_system').doc('practical_schedule_v2')
           .onSnapshot(doc => {
@@ -524,7 +894,7 @@
       }
     }
 
-    // رسم الجدول
+    // ─── رسم الجدول ───
     function renderTable() {
       const tbody = document.getElementById('scheduleTableBody');
       tbody.innerHTML = '';
@@ -534,7 +904,6 @@
         tr.className = 'hover:bg-slate-50/60 transition';
         tr.id = `row_${day.dayKey}`;
 
-        // حساب ساعات اليوم
         let totalDayH = 0;
         if (day.morning) totalDayH += parseFloat(day.morning.hours) || 0;
         if (day.evening) {
@@ -544,7 +913,6 @@
           }
         }
 
-        // عمود اليوم
         let dayHtml = `
           <td class="p-3 sm:p-4 text-center border-l border-slate-200 font-bold text-slate-900 bg-slate-50/50">
             <div class="text-sm sm:text-base font-amiri text-emerald-950 font-bold">${day.dayName}</div>
@@ -552,7 +920,7 @@
           </td>
         `;
 
-        // 1. الخلية الصباحية
+        // الخلية الصباحية
         let morningCell = '';
         if (day.morning) {
           const m = day.morning;
@@ -563,13 +931,10 @@
           morningCell = `
             <td class="p-3 sm:p-4 border-l border-slate-200 align-top">
               <div class="space-y-2">
-                <!-- شارة إلقاء القرآن الصباحي -->
                 <div class="flex items-center gap-1.5 text-[11px] bg-emerald-50 border border-emerald-200 text-emerald-900 px-2.5 py-1 rounded-lg font-bold">
                   <span>📖</span>
                   <span><strong>إلقاء القرآن:</strong> 5 آيات قبل بداية المجلس</span>
                 </div>
-
-                <!-- بطاقة المجلس العلمي الصباحي -->
                 <div class="p-3 rounded-xl border ${bgClass} shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div class="space-y-1">
                     <span class="font-bold text-xs sm:text-sm ${textClass}" ${isEditMode ? `contenteditable="true" onblur="updateTitle(${dayIndex}, 'morning', this.innerText)"` : ''}>
@@ -584,8 +949,6 @@
                       </span>
                     </div>
                   </div>
-
-                  <!-- زر إنجاز الدرس الصباحي -->
                   <button onclick="toggleDone(${dayIndex}, 'morning')" class="no-print whitespace-nowrap self-start sm:self-center px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-xs ${
                     isDone 
                       ? 'bg-emerald-700 text-white hover:bg-emerald-800' 
@@ -594,8 +957,6 @@
                     ${isDone ? '✅ مكتمل' : '⚪ ضع علامة إنجاز'}
                   </button>
                 </div>
-
-                <!-- شارة أذكار الصباح بعد الفجر -->
                 <div class="flex items-center gap-1.5 text-[11px] bg-amber-50/80 border border-amber-200 text-amber-900 px-2.5 py-1 rounded-lg font-medium">
                   <span>🤲</span>
                   <span><strong>أذكار الصباح:</strong> قراءة جماعية بعد أذان الفجر</span>
@@ -605,7 +966,7 @@
           `;
         }
 
-        // 2. الخلية المسائية
+        // الخلية المسائية
         let eveningCell = '';
         if (day.evening) {
           const e = day.evening;
@@ -617,14 +978,11 @@
             <td class="p-3 sm:p-4 border-l border-slate-200 align-top">
               <div class="space-y-2">
                 ${e.adhkarRoutine ? `
-                  <!-- شارة أذكار المساء في مطلع المجلس -->
                   <div class="flex items-center gap-1.5 text-[11px] bg-amber-50/80 border border-amber-200 text-amber-900 px-2.5 py-1 rounded-lg font-medium">
                     <span>🤲</span>
                     <span><strong>أذكار المساء:</strong> نقرأها جماعةً في مطلع وافتتاح المجلس العلمي</span>
                   </div>
                 ` : ''}
-
-                <!-- بطاقة المقرر المسائي -->
                 <div class="p-3 rounded-xl border ${bgClass} shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div class="space-y-1">
                     <span class="font-bold text-xs sm:text-sm ${textClass}" ${isEditMode ? `contenteditable="true" onblur="updateTitle(${dayIndex}, 'evening', this.innerText)"` : ''}>
@@ -641,7 +999,6 @@
                       ` : ''}
                     </div>
                   </div>
-
                   ${e.hours > 0 ? `
                     <button onclick="toggleDone(${dayIndex}, 'evening')" class="no-print whitespace-nowrap self-start sm:self-center px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-xs ${
                       isDone 
@@ -652,8 +1009,6 @@
                     </button>
                   ` : ''}
                 </div>
-
-                <!-- المجلس القرآني الخاص بليلة الجمعة -->
                 ${e.specialNightSession ? `
                   <div class="p-3 rounded-xl border-2 border-emerald-300 bg-emerald-50/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="space-y-1">
@@ -672,7 +1027,6 @@
                         </span>
                       </div>
                     </div>
-
                     <button onclick="toggleSpecialNightDone(${dayIndex})" class="no-print whitespace-nowrap self-start sm:self-center px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-xs ${
                       e.specialNightSession.done 
                         ? 'bg-emerald-800 text-white' 
@@ -692,12 +1046,10 @@
             ${totalDayH} س
           </td>
         `;
-
         tbody.appendChild(tr);
       });
     }
 
-    // تبديل حالة إنجاز الدرس
     function toggleDone(dayIndex, periodType) {
       if (scheduleData[dayIndex] && scheduleData[dayIndex][periodType]) {
         scheduleData[dayIndex][periodType].done = !scheduleData[dayIndex][periodType].done;
@@ -712,7 +1064,6 @@
       }
     }
 
-    // تصفير تقدم الأسبوع
     function resetWeeklyProgress() {
       if (confirm("هل ترغب في إعادة ضبط جميع علامات الإنجاز لبدء أسبوع جديد؟")) {
         scheduleData.forEach(d => {
@@ -726,33 +1077,22 @@
       }
     }
 
-    // تحديث الإحصائيات الفورية
     function updateDashboard() {
-      let totalHours = 0;
-      let doneHours = 0;
-      let totalLessons = 0;
-      let doneLessons = 0;
-
+      let totalHours = 0, doneHours = 0, totalLessons = 0, doneLessons = 0;
       scheduleData.forEach(d => {
         ['morning', 'evening'].forEach(p => {
           if (d[p] && d[p].hours > 0) {
             const h = parseFloat(d[p].hours) || 0;
             totalHours += h;
             totalLessons++;
-            if (d[p].done) {
-              doneHours += h;
-              doneLessons++;
-            }
+            if (d[p].done) { doneHours += h; doneLessons++; }
           }
         });
         if (d.evening && d.evening.specialNightSession) {
           const h = parseFloat(d.evening.specialNightSession.hours) || 0;
           totalHours += h;
           totalLessons++;
-          if (d.evening.specialNightSession.done) {
-            doneHours += h;
-            doneLessons++;
-          }
+          if (d.evening.specialNightSession.done) { doneHours += h; doneLessons++; }
         }
       });
 
@@ -765,26 +1105,18 @@
       document.getElementById('statHoursProgressBar').style.width = `${pct}%`;
     }
 
-    // تمييز اليوم الحالي في الجدول
     function detectCurrentDay() {
-      const daysArabic = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-      const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
       const todayIdx = new Date().getDay();
-      const currentDayName = daysArabic[todayIdx];
-      const currentDayKey = dayKeys[todayIdx];
+      const currentDayName = ARABIC_DAY_NAMES[todayIdx];
+      const currentDayKey = JS_DAY_TO_KEY[todayIdx];
 
       const indicator = document.getElementById('todayIndicator');
-      if (indicator) {
-        indicator.innerText = `اليوم الحالي: ${currentDayName} 📍`;
-      }
+      if (indicator) indicator.innerText = `اليوم الحالي: ${currentDayName} 📍`;
 
       const row = document.getElementById(`row_${currentDayKey}`);
-      if (row) {
-        row.classList.add('bg-amber-50/50');
-      }
+      if (row) row.classList.add('bg-amber-50/50');
     }
 
-    // وضع التعديل السريع
     function toggleEditMode() {
       isEditMode = !isEditMode;
       const btn = document.getElementById('toggleEditBtn');
@@ -822,27 +1154,11 @@
       }
     }
 
-    // دوال تحميل الجدول
-    function toggleDownloadMenu() {
-      const menu = document.getElementById('downloadMenu');
-      if (menu) menu.classList.toggle('hidden');
-    }
-
-    document.addEventListener('click', function(e) {
-      const menu = document.getElementById('downloadMenu');
-      if (menu && !menu.classList.contains('hidden')) {
-        if (!e.target.closest('.relative')) {
-          menu.classList.add('hidden');
-        }
-      }
-    });
-
+    // ─── دوال التحميل ───
     function downloadAsImage() {
-      toggleDownloadMenu();
-      const element = document.querySelector('main') || document.body;
-      
+      const element = document.getElementById('scheduleTableMain') || document.body;
       const notif = document.createElement('div');
-      notif.className = 'fixed bottom-5 right-5 bg-blue-900 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-2xl z-50 animate-bounce flex items-center gap-2';
+      notif.className = 'fixed bottom-5 right-5 bg-joussour-black text-joussour-gold px-4 py-2.5 rounded-xl text-xs font-bold shadow-2xl z-50 animate-bounce flex items-center gap-2';
       notif.innerHTML = '<span>⏳</span><span>جارٍ تجهيز صورة الجدول عالية الدقة...</span>';
       document.body.appendChild(notif);
 
@@ -865,20 +1181,7 @@
     }
 
     function downloadAsPDF() {
-      toggleDownloadMenu();
       window.print();
-    }
-
-    function downloadAsHTML() {
-      toggleDownloadMenu();
-      const htmlContent = document.documentElement.outerHTML;
-      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'جدول_المدارسة_الأسبوعي.html';
-      a.click();
-      URL.revokeObjectURL(url);
     }
 
     window.onload = loadData;
